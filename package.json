@@ -1,0 +1,35 @@
+{
+  "name": "deferred-require",
+  "version": "0.0.0",
+  "description": "A require function that defers actual reads until the first use of the required object",
+  "main": "./lib/deferred-require",
+  "scripts": {
+    "prepublish": "grunt clean lint coffee",
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/deferred-require.git"
+  },
+  "bugs": {
+    "url": "https://github.com/atom/deferred-require/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/atom/deferred-require/raw/master/LICENSE.md"
+    }
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {
+    "coffee-script": "~1.6.3",
+    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-cli": "~0.1.8",
+    "grunt": "~0.4.1",
+    "grunt-shell": "~0.2.2",
+    "grunt-coffeelint": "0.0.6",
+    "rimraf": "~2.2.2",
+    "json-diff": "~0.3.1",
+  }
+}
