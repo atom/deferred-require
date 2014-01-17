@@ -3,19 +3,29 @@ Module = require 'module'
 
 originalRequire = Module::require
 
-deferredRequire = (path) ->
-  Proxy(new RequireTarget(this, path), RequireHandler)
-
-exports.run = (fn) ->
-  Module::require = deferredRequire
-  result = fn()
-  Module::require = originalRequire
-  result
+module.exports = (parentPath, errorHandler) ->
+  try
+    Module::require = (path) -> Proxy(new RequireTarget(this, path, errorHandler), RequireHandler)
+    module = originalRequire.call(module, parentPath)
+  finally
+    Module::require = originalRequire
+  module
 
 class RequireTarget
-  constructor: (@parentModule, @path) ->
+  constructor: (@parentModule, @path, @errorHandler) ->
+
   getModule: ->
-    @module ?= originalRequire.call(@parentModule, @path)
+    @module ?= @requireModule()
+
+  requireModule: ->
+    if @errorHandler?
+      try
+        originalRequire.call(@parentModule, @path)
+      catch e
+        @errorHandler(e)
+        {}
+    else
+      originalRequire.call(@parentModule, @path)
 
 RequireHandler =
   get: (target, name, receiver) ->
