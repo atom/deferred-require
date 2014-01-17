@@ -1,6 +1,6 @@
 {
   "name": "deferred-require",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A require function that defers actual reads until the first use of the required object",
   "main": "./lib/deferred-require",
   "scripts": {
@@ -20,8 +20,7 @@
       "url": "http://github.com/atom/deferred-require/raw/master/LICENSE.md"
     }
   ],
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "coffee-script": "~1.6.3",
     "grunt-contrib-coffee": "~0.7.0",
