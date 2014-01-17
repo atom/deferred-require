@@ -8,8 +8,9 @@ deferredRequire = (path) ->
 
 exports.run = (fn) ->
   Module::require = deferredRequire
-  fn()
+  result = fn()
   Module::require = originalRequire
+  result
 
 class RequireTarget
   constructor: (@parentModule, @path) ->
