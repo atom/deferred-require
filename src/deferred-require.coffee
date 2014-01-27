@@ -1,33 +1,31 @@
 require 'harmony-reflect'
 Module = require 'module'
 
-originalRequire = Module::require
+module.exports = (path, errorHandler) ->
+  target = new Function
+  target.path = path
+  target.errorHandler = errorHandler
+  target.__proto__ = RequireProxyTarget
+  Proxy(target, RequireProxyHandler)
 
-module.exports = (parentPath, errorHandler) ->
-  try
-    Module::require = (path) -> Proxy(new RequireTarget(this, path, errorHandler), RequireHandler)
-    module = originalRequire.call(module, parentPath)
-  finally
-    Module::require = originalRequire
-  module
-
-class RequireTarget
-  constructor: (@parentModule, @path, @errorHandler) ->
-
+RequireProxyTarget =
   getModule: ->
     @module ?= @requireModule()
 
   requireModule: ->
     if @errorHandler?
       try
-        originalRequire.call(@parentModule, @path)
-      catch e
-        @errorHandler(e)
-        {}
+        Module::require.call(module.parent, @path)
+      catch error
+        handlerResult = @errorHandler(error)
+        if typeof handlerResult is 'object'
+          handlerResult
+        else
+          {}
     else
-      originalRequire.call(@parentModule, @path)
+      Module::require.call(module.parent, @path)
 
-RequireHandler =
+RequireProxyHandler =
   get: (target, name, receiver) ->
     Reflect.get(target.getModule(), name, receiver)
 

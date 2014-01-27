@@ -1,54 +1,25 @@
 # Deferred Require
 
-To use, run node with the `--harmony_proxies` and `--harmony_collections` flags.
-
-This npm exports a single top-level function. When called with a path, this
-function will require the file at the given path as usual, but any `require`
-calls *within* that file will return a special deferred objects that delay
-actually requiring anything until the required object is used.
-
-## Basic Example
+**Using this module requires that you run node with the `--harmony_proxies` and
+`--harmony_collections` flags.**
 
 ```coffee
-# file-1.coffee
-deferredRequire = require 'deferredRequire'
-foo = deferredRequire('./file-2')
-
-# actually performs the requires in file-2 because of usage
-foo()
-```
-
-```coffee
-# file-2.coffee
-bar = require 'huge-expensive-require'
-module.exports = -> bar() + 1
-```
-
-In `file-2`, we require `huge-expensive-require`, but we don't use its exports
-immediately. Because `file-2` is required with `deferredRequire`, we won't
-actually perform the expensive require until it is used in file-1.
-
-## Error Handling
-
-Normally, if a required module throws an exception as it's being required it
-can be caught by the code doing the requiring. With deferred-require, the
-exception might not get thrown until the object is first used. If you want to
-catch these exceptions, pass an error handler function to `deferredRequire`.
-
-```coffee
-# file-1.coffee
 deferredRequire = require 'deferred-require'
-deferredRequire './file-2', (error) -> console.warn("Error", e.stack)
+myHugeModule = require 'my-huge-module'
+
+# ... some time later ...
+
+myHugeModule.doSomething() # the module isn't loaded and required until here
 ```
 
-```coffee
-# file-2.coffee
-bar = require 'exception-throwing-module'
-module.exports = -> bar() + 1
-```
+This npm exports a single top-level function, `deferredRequire`, which you can
+use just as you would use node's global `require` function. When you require a
+module with `deferredRequire`, no code is actually loaded or evaluated until
+the module you require is first used. This is achieved through the magic of
+harmony proxies.
 
-## Caveats
-
-This is achieved via ES6 harmony proxies. If your top-level require is an
-irregular object such as an array, a Date object, or host object, you may
-encounter instability until V8 fully supports these kinds of objects.
+Warning: Because of instability in the v8 proxy implementation when combined
+with "exotic objects" like arrays, strings, and dates, you should only use
+`deferredRequire` with modules that export regular objects or functions as their
+top-level module. This is true of almost every npm module, so in practice this
+shouldn't be a big issue.
