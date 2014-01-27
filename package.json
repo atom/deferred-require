@@ -1,6 +1,6 @@
 {
   "name": "deferred-require",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A require function that defers actual reads until the first use of the required object",
   "main": "./lib/deferred-require",
   "scripts": {
